@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FacebookFriendsList</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="facebook_app_id">1500249976961459</string>
+    <string name="friends_list">Show Friends List</string>
+    <string name="login_using_loginmanager">FB Login using LoginManager</string>
+</resources>
