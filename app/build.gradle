@@ -26,4 +26,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.facebook.android:facebook-android-sdk:4.0.0'
+    compile 'com.mcxiaoke.volley:library:1.0.17'
+    compile group:'com.squareup.picasso', name:'picasso', version:'2.3.2'
 }
