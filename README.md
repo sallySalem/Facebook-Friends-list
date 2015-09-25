@@ -54,5 +54,81 @@ dependencies {
 
 
 ## Login using “LoginButton”
+* In activity_main.xml
+``` XML
+<com.facebook.login.widget.LoginButton
+    android:id="@+id/fbButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    />
+```
+
+* In “AndroidManifest.xml”
+``` Java
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+Under  ``` <application ```
+``` Java
+<meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+```
+Then add facebook loginActivity to your Manifest
+``` Java
+<activity android:name="com.facebook.FacebookActivity"
+    android:configChanges=
+        "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+    android:theme="@android:style/Theme.Translucent.NoTitleBar"
+    android:label="@string/app_name" />
+```
+* Then on “MainActivity.java”
+``` Java
+private TextView tvLoginResult;
+private LoginButton btnFBLogin; 
+
+private CallbackManager callbackManager;
+
+@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        setContentView(R.layout.activity_main);
+
+        tvLoginResult = (TextView) findViewById(R.id.tv_LoginResult);
+        btnFBLogin = (LoginButton) findViewById(R.id.fbButton); 
+
+        //init the callback manager
+        callbackManager = CallbackManager.Factory.create();
+
+        btnFBLogin.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                tvLoginResult.setText( "Success Login" + "\n"+
+                        "User = " + loginResult.getAccessToken().getUserId() + "\n" +
+                                "Token = " + loginResult.getAccessToken().getToken()
+                );
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+        //to pass Results to your facebook callbackManager
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+```
+
+
 ## Login Using Login Manager
 ## Display Friends list
