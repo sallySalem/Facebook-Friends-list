@@ -75,6 +75,7 @@ public class FBFriendsListActivity extends ActionBarActivity {
     }
 
     private void getFBFriendsList() {
+        //fbToken return from login with facebook
         GraphRequestAsyncTask r = GraphRequest.newGraphPathRequest(fbToken,
                 "/me/taggable_friends", new Callback() {
 
@@ -116,6 +117,7 @@ public class FBFriendsListActivity extends ActionBarActivity {
                         e.printStackTrace();
                     }
                 }
+                // facebook use paging if have "next" this mean you still have friends if not start load fbFriends list
                 String next = friends.getJSONObject("paging")
                         .getString("next");
                 if (next != null) {
