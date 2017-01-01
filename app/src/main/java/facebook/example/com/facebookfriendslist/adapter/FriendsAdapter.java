@@ -82,9 +82,6 @@ public class FriendsAdapter extends ArrayAdapter<FriendItem> {
 
         Animation anim = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
         viewHolder.ivUser.setAnimation(anim);
-
-
-
         return convertView;
 
     }
