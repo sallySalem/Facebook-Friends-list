@@ -7,4 +7,7 @@
     <string name="friends_list">Show Friends List</string>
     <string name="login_using_loginmanager">FB Login using LoginManager</string>
     <string name="title_activity_fbfriends_list">FBFriendsListActivity</string>
+    <string name="success_login">Success Login</string>
+    <string name="user">"User = "</string>
+    <string name="token">"Token = "</string>
 </resources>
