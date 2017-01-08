@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import facebook.example.com.facebookfriendslist.model.FriendItem;
+import facebook.example.com.facebookfriendslist.usecase.GetFriendsList;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -31,6 +32,8 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 public class FriendsListPresenter {
     private FriendsListView view;
     private ArrayList<FriendItem> friendsList = new ArrayList<FriendItem>();
+
+    private GetFriendsList friendsListUseCase = new GetFriendsList();
 
     public FriendsListPresenter(FriendsListView view) {
         this.view = view;
@@ -44,24 +47,11 @@ public class FriendsListPresenter {
 
     public void onGetFBFriendsList() {
         AccessToken fbToken = AccessToken.getCurrentAccessToken();
-
-        //fbToken return from login with facebook
-        GraphRequestAsyncTask r = GraphRequest.newGraphPathRequest(fbToken,
-                "/me/taggable_friends", new GraphRequest.Callback() {
-
-                    @Override
-                    public void onCompleted(GraphResponse response) {
-                        parseResponse(response.getJSONObject());
-                    }
-                }
-        ).executeAsync();
+        friendsListUseCase.getTaggableFriends(fbToken, graphRequestCallback);
     }
 
-    private void parseResponse(JSONObject friends ) {
-
+    private void parseResponse(JSONObject friends) {
         try {
-//            JSONObject friends = response.getJSONObject();
-//            JSONObject friends = new JSONObject(response);
             JSONArray friendsArray = (JSONArray) friends.get("data");
             if (friendsArray != null) {
                 for (int i = 0; i < friendsArray.length(); i++) {
@@ -79,10 +69,9 @@ public class FriendsListPresenter {
                     }
                 }
                 // facebook use paging if have "next" this mean you still have friends if not start load fbFriends list
-                String next = friends.getJSONObject("paging")
-                        .getString("next");
+                String next = friends.getJSONObject("paging").getString("next");
                 if (next != null) {
-                    getFBFriendsList(next);
+                    friendsListUseCase.getFBFriendsList(next, fbListCallback);
                 } else {
                     view.loadFriendsList(friendsList);
                 }
@@ -93,41 +82,25 @@ public class FriendsListPresenter {
         }
     }
 
-    private void getFBFriendsList(String next) {
-        //here i used volley to get next page
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest sr = new StringRequest(Request.Method.GET, next,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+    private GraphRequest.Callback graphRequestCallback = new GraphRequest.Callback() {
 
-                        JSONObject friends = null;
-                        try {
-                            friends = new JSONObject(response);
-                            parseResponse(friends);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+        @Override
+        public void onCompleted(GraphResponse response) {
+            parseResponse(response.getJSONObject());
+        }
+    };
+
+    private Response.Listener fbListCallback = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+
+            JSONObject friends = null;
+            try {
+                friends = new JSONObject(response);
+                parseResponse(friends);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Content-Type", "application/x-www-form-urlencoded");
-                return params;
-            }
-        };
-
-        queue.add(sr);
-    }
-
+        }
+    };
 }
