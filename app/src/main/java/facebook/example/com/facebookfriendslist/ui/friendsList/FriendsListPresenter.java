@@ -30,9 +30,10 @@ import static com.facebook.FacebookSdk.getApplicationContext;
  */
 
 public class FriendsListPresenter {
+    private String userId;
+    private AccessToken fbToken;
     private FriendsListView view;
     private ArrayList<FriendItem> friendsList = new ArrayList<FriendItem>();
-
     private GetFriendsList friendsListUseCase = new GetFriendsList();
 
     public FriendsListPresenter(FriendsListView view) {
@@ -46,7 +47,8 @@ public class FriendsListPresenter {
     }
 
     public void onGetFBFriendsList() {
-        AccessToken fbToken = AccessToken.getCurrentAccessToken();
+        fbToken = AccessToken.getCurrentAccessToken();
+        userId = AccessToken.getCurrentAccessToken().getUserId();
         friendsListUseCase.getTaggableFriends(fbToken, graphRequestCallback);
     }
 
@@ -70,8 +72,10 @@ public class FriendsListPresenter {
                 }
                 // facebook use paging if have "next" this mean you still have friends if not start load fbFriends list
                 String next = friends.getJSONObject("paging").getString("next");
+                String after = friends.getJSONObject("paging").getJSONObject("cursors").getString("after");
                 if (next != null) {
-                    friendsListUseCase.getFBFriendsList(next, fbListCallback);
+                    //friendsListUseCase.getFBFriendsList(next, fbListCallback);
+                    friendsListUseCase.getFBFriendsList(userId, fbToken.getToken(), 25, after);
                 } else {
                     view.loadFriendsList(friendsList);
                 }

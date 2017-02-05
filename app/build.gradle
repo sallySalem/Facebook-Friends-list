@@ -28,4 +28,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.0.0'
     compile 'com.mcxiaoke.volley:library:1.0.17'
     compile group:'com.squareup.picasso', name:'picasso', version:'2.3.2'
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
 }
