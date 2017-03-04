@@ -10,5 +10,4 @@
     <string name="success_login">Success Login</string>
     <string name="user">"User = "</string>
     <string name="token">"Token = "</string>
-    <string name="loginErrorMessage">Please Login</string>
 </resources>

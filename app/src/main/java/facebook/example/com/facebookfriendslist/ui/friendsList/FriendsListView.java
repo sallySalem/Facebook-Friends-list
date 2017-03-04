@@ -2,7 +2,7 @@ package facebook.example.com.facebookfriendslist.ui.friendsList;
 
 import java.util.ArrayList;
 
-import facebook.example.com.facebookfriendslist.data.model.FriendItemData;
+import facebook.example.com.facebookfriendslist.model.FriendItem;
 
 /**
  * Created by Sally on 01-Jan-17.
@@ -11,7 +11,5 @@ import facebook.example.com.facebookfriendslist.data.model.FriendItemData;
 public interface FriendsListView {
     void initializeView();
 
-    void loadFriendsList(ArrayList<FriendItemData> friendsList);
-
-    void showError();
+    void loadFriendsList(ArrayList<FriendItem> friendsList);
 }
