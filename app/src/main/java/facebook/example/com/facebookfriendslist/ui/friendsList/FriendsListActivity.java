@@ -1,44 +1,20 @@
 package facebook.example.com.facebookfriendslist.ui.friendsList;
 
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphRequestAsyncTask;
-import com.facebook.GraphResponse;
-import com.facebook.GraphRequest.Callback;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.RunnableFuture;
 
 import facebook.example.com.facebookfriendslist.R;
 import facebook.example.com.facebookfriendslist.adapter.FriendsAdapter;
-import facebook.example.com.facebookfriendslist.model.FriendItem;
-import facebook.example.com.facebookfriendslist.ui.main.MainActivity;
+import facebook.example.com.facebookfriendslist.data.model.FriendItemData;
 
 
 public class FriendsListActivity extends ActionBarActivity implements FriendsListView{
-    private ArrayList<FriendItem> friendsList = new ArrayList<FriendItem>();
+    private ArrayList<FriendItemData> friendsList = new ArrayList<FriendItemData>();
     private SwipeRefreshLayout swipeLayout;
     private ListView lvFriendsList;
     private FriendsAdapter friendsAdapter;
@@ -70,9 +46,9 @@ public class FriendsListActivity extends ActionBarActivity implements FriendsLis
     }
 
     @Override
-    public void loadFriendsList(ArrayList<FriendItem> fLst) {
+    public void loadFriendsList(ArrayList<FriendItemData> fLst) {
         friendsList.removeAll(friendsList);
-        this.friendsList.addAll(fLst);
+        friendsList.addAll(fLst);
         swipeLayout.setRefreshing(false);
 
         if ((friendsList != null) && (friendsList.size() > 0)) {

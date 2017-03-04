@@ -14,17 +14,18 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import facebook.example.com.facebookfriendslist.R;
-import facebook.example.com.facebookfriendslist.model.FriendItem;
+import facebook.example.com.facebookfriendslist.data.model.FriendItemData;
 
 /**
  * Created by Sally on 04-Sep-15.
  */
-public class FriendsAdapter extends ArrayAdapter<FriendItem> {
+public class FriendsAdapter extends ArrayAdapter<FriendItemData> {
 
     private Context context;
-    private ArrayList<FriendItem> friendsList;
+    private ArrayList<FriendItemData> friendsList;
 
     static class ViewHolder {
         public ImageView ivUser;
@@ -35,16 +36,14 @@ public class FriendsAdapter extends ArrayAdapter<FriendItem> {
      * @param context
      * @param friendsList
      */
-    public FriendsAdapter(Context context,
-                            ArrayList<FriendItem> friendsList) {
+    public FriendsAdapter(Context context, ArrayList<FriendItemData> friendsList) {
         super(context, R.layout.item_friend, friendsList);
         this.context = context;
         this.friendsList = friendsList;
     }
 
     @Override
-    public FriendItem getItem(int position) {
-        // TODO Auto-generated method stub
+    public FriendItemData getItem(int position) {
         return super.getItem(position);
     }
 
@@ -56,33 +55,24 @@ public class FriendsAdapter extends ArrayAdapter<FriendItem> {
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.item_friend, null);
             viewHolder = new ViewHolder();
-            viewHolder.ivUser = (ImageView) convertView
-                    .findViewById(R.id.iv_User);
-            viewHolder.tvUserName = (TextView) convertView
-                    .findViewById(R.id.tv_UserName);
+            viewHolder.ivUser = (ImageView) convertView.findViewById(R.id.iv_User);
+            viewHolder.tvUserName = (TextView) convertView.findViewById(R.id.tv_UserName);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // String imageURL = notificationsList.get(position).getImage();
-        String text = "";
-
-        text += friendsList.get(position).getUserName();
-        viewHolder.tvUserName.setText(text);
-        String imageURL = "";
-
-            imageURL = friendsList.get(position).getPictureURL();
-
-        if (imageURL != null) {
-            if (imageURL.trim().length() > 0) {
-                Picasso.with(context).load(imageURL).into(viewHolder.ivUser);
+        String friendName = friendsList.get(position).getName();
+        viewHolder.tvUserName.setText(friendName);
+        String imageUrl = friendsList.get(position).getPicture();
+        if (imageUrl != null) {
+            if (imageUrl.trim().length() > 0) {
+                Picasso.with(context).load(imageUrl).into(viewHolder.ivUser);
             }
         }
 
         Animation anim = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
         viewHolder.ivUser.setAnimation(anim);
         return convertView;
-
     }
 }
