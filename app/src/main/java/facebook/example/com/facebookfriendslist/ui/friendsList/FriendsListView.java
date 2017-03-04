@@ -12,4 +12,6 @@ public interface FriendsListView {
     void initializeView();
 
     void loadFriendsList(ArrayList<FriendItemData> friendsList);
+
+    void showError();
 }

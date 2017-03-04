@@ -52,8 +52,12 @@ public class FriendsListPresenter {
 
     public void onGetFBFriendsList() {
         fbToken = AccessToken.getCurrentAccessToken();
-        userId = AccessToken.getCurrentAccessToken().getUserId();
-        friendsListUseCase.getFBFriendsList(userId, fbToken.getToken(), PAGE_SIZE, nextPageId, friendsListCallback);
+        if(fbToken != null) {
+            userId = fbToken.getUserId();
+            friendsListUseCase.getFBFriendsList(userId, fbToken.getToken(), PAGE_SIZE, nextPageId, friendsListCallback);
+        }else {
+            view.showError();
+        }
     }
 
     public void onLoadMore(int totalItemsCount, int visibleItemsCount, int firstVisibleItemPosition) {
