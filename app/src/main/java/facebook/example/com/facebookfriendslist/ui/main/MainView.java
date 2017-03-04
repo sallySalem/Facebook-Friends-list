@@ -1,5 +1,6 @@
 package facebook.example.com.facebookfriendslist.ui.main;
 
+import com.facebook.AccessToken;
 import com.facebook.login.LoginResult;
 
 /**
@@ -13,7 +14,7 @@ public interface MainView {
 
     void showFriendsList();
 
-    void showFBLoginResult(LoginResult loginResult);
+    void showFBLoginResult(AccessToken fbAccessToken);
 
     void loginUsingFBManager();
 }

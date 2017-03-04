@@ -1,17 +1,13 @@
 package facebook.example.com.facebookfriendslist.ui.main;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -20,8 +16,6 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import facebook.example.com.facebookfriendslist.ui.friendsList.FriendsListActivity;
@@ -72,11 +66,11 @@ public class MainActivity extends ActionBarActivity implements MainView, View.On
     }
 
     @Override
-    public void showFBLoginResult(LoginResult loginResult) {
+    public void showFBLoginResult(AccessToken fbAccessToken) {
         btnShowFriendsList.setVisibility(View.VISIBLE);
         tvLoginResult.setText( getString(R.string.success_login) + "\n"+
-                getString(R.string.user) + loginResult.getAccessToken().getUserId() + "\n" +
-                getString(R.string.token) + loginResult.getAccessToken().getToken()
+                getString(R.string.user) + fbAccessToken.getUserId() + "\n" +
+                getString(R.string.token) + fbAccessToken.getToken()
         );
     }
 

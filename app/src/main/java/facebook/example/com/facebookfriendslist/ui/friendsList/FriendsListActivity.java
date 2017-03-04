@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -73,5 +74,10 @@ public class FriendsListActivity extends ActionBarActivity implements FriendsLis
         } else {
             lvFriendsList.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void showError() {
+        Toast.makeText(this, R.string.loginErrorMessage, Toast.LENGTH_LONG).show();
     }
 }
