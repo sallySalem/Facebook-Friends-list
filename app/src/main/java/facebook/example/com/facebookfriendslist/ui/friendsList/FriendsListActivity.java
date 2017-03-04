@@ -1,46 +1,24 @@
 package facebook.example.com.facebookfriendslist.ui.friendsList;
 
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ListView;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphRequestAsyncTask;
-import com.facebook.GraphResponse;
-import com.facebook.GraphRequest.Callback;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.RunnableFuture;
 
 import facebook.example.com.facebookfriendslist.R;
 import facebook.example.com.facebookfriendslist.adapter.FriendsAdapter;
-import facebook.example.com.facebookfriendslist.model.FriendItem;
-import facebook.example.com.facebookfriendslist.ui.main.MainActivity;
+import facebook.example.com.facebookfriendslist.data.model.FriendItemData;
 
 
-public class FriendsListActivity extends ActionBarActivity implements FriendsListView{
-    private ArrayList<FriendItem> friendsList = new ArrayList<FriendItem>();
+public class FriendsListActivity extends ActionBarActivity implements FriendsListView {
+    private ArrayList<FriendItemData> friendsList = new ArrayList<FriendItemData>();
     private SwipeRefreshLayout swipeLayout;
-    private ListView lvFriendsList;
+    private RecyclerView lvFriendsList;
     private FriendsAdapter friendsAdapter;
     private FriendsListPresenter presenter;
 
@@ -55,11 +33,6 @@ public class FriendsListActivity extends ActionBarActivity implements FriendsLis
 
     @Override
     public void initializeView() {
-        lvFriendsList = (ListView) findViewById(R.id.lv_FriendsList);
-        friendsAdapter = new FriendsAdapter(getApplicationContext(), friendsList);
-        friendsAdapter.notifyDataSetChanged();
-        lvFriendsList.setAdapter(friendsAdapter);
-
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setColorSchemeColors(
                 getResources().getColor(android.R.color.holo_green_dark),
@@ -67,12 +40,32 @@ public class FriendsListActivity extends ActionBarActivity implements FriendsLis
                 getResources().getColor(android.R.color.holo_blue_dark),
                 getResources().getColor(android.R.color.holo_orange_dark));
         swipeLayout.setRefreshing(true);
+
+        lvFriendsList = (RecyclerView) findViewById(R.id.rv_friends_list);
+
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        lvFriendsList.setLayoutManager(linearLayoutManager);
+
+        friendsAdapter = new FriendsAdapter(friendsList);
+        lvFriendsList.setAdapter(friendsAdapter);
+
+        lvFriendsList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int totalItemsCount = linearLayoutManager.getItemCount();
+                int visibleItemsCount = lvFriendsList.getChildCount();
+                int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+
+                presenter.onLoadMore(totalItemsCount, visibleItemsCount, firstVisibleItemPosition);
+            }
+        });
     }
 
     @Override
-    public void loadFriendsList(ArrayList<FriendItem> fLst) {
+    public void loadFriendsList(ArrayList<FriendItemData> fLst) {
         friendsList.removeAll(friendsList);
-        this.friendsList.addAll(fLst);
+        friendsList.addAll(fLst);
         swipeLayout.setRefreshing(false);
 
         if ((friendsList != null) && (friendsList.size() > 0)) {
@@ -81,5 +74,10 @@ public class FriendsListActivity extends ActionBarActivity implements FriendsLis
         } else {
             lvFriendsList.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void showError() {
+        Toast.makeText(this, R.string.loginErrorMessage, Toast.LENGTH_LONG).show();
     }
 }

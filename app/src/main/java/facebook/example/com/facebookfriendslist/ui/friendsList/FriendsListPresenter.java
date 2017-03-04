@@ -1,5 +1,7 @@
 package facebook.example.com.facebookfriendslist.ui.friendsList;
 
+import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -20,114 +22,92 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import facebook.example.com.facebookfriendslist.model.FriendItem;
+import facebook.example.com.facebookfriendslist.data.model.FriendItemData;
+import facebook.example.com.facebookfriendslist.data.model.FriendsListResponse;
+import facebook.example.com.facebookfriendslist.usecase.GetFriendsList;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
+import static facebook.example.com.facebookfriendslist.util.Constants.PAGE_SIZE;
 
 /**
  * Created by Sally on 01-Jan-17.
  */
 
 public class FriendsListPresenter {
+    private String userId;
+    private AccessToken fbToken;
     private FriendsListView view;
-    private ArrayList<FriendItem> friendsList = new ArrayList<FriendItem>();
+    private ArrayList<FriendItemData> friendsList = new ArrayList<FriendItemData>();
+    private String nextPageId;
+    private GetFriendsList friendsListUseCase = new GetFriendsList();
+    private String previousPageId;
+    private boolean isLoadingMore = false;
 
     public FriendsListPresenter(FriendsListView view) {
         this.view = view;
-
-        initialize();
-    }
-
-    private void initialize() {
         view.initializeView();
     }
 
     public void onGetFBFriendsList() {
-        AccessToken fbToken = AccessToken.getCurrentAccessToken();
-
-        //fbToken return from login with facebook
-        GraphRequestAsyncTask r = GraphRequest.newGraphPathRequest(fbToken,
-                "/me/taggable_friends", new GraphRequest.Callback() {
-
-                    @Override
-                    public void onCompleted(GraphResponse response) {
-                        parseResponse(response.getJSONObject());
-                    }
-                }
-        ).executeAsync();
-    }
-
-    private void parseResponse(JSONObject friends ) {
-
-        try {
-//            JSONObject friends = response.getJSONObject();
-//            JSONObject friends = new JSONObject(response);
-            JSONArray friendsArray = (JSONArray) friends.get("data");
-            if (friendsArray != null) {
-                for (int i = 0; i < friendsArray.length(); i++) {
-                    FriendItem item = new FriendItem();
-                    try {
-                        item.setUserId(friendsArray.getJSONObject(i).get("id") + "");
-                        item.setUserName(friendsArray.getJSONObject(i).get("name") + "");
-                        JSONObject picObject = new JSONObject(friendsArray.getJSONObject(i).get("picture") + "");
-                        String picURL = (String) (new JSONObject(picObject.get("data").toString())).get("url");
-                        item.setPictureURL(picURL);
-                        friendsList.add(item);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                // facebook use paging if have "next" this mean you still have friends if not start load fbFriends list
-                String next = friends.getJSONObject("paging")
-                        .getString("next");
-                if (next != null) {
-                    getFBFriendsList(next);
-                } else {
-                    view.loadFriendsList(friendsList);
-                }
-            }
-        } catch (JSONException e1) {
-            view.loadFriendsList(friendsList);
-            e1.printStackTrace();
+        fbToken = AccessToken.getCurrentAccessToken();
+        if(fbToken != null) {
+            userId = fbToken.getUserId();
+            friendsListUseCase.getFBFriendsList(userId, fbToken.getToken(), PAGE_SIZE, nextPageId, friendsListCallback);
+        }else {
+            view.showError();
         }
     }
 
-    private void getFBFriendsList(String next) {
-        //here i used volley to get next page
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest sr = new StringRequest(Request.Method.GET, next,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        JSONObject friends = null;
-                        try {
-                            friends = new JSONObject(response);
-                            parseResponse(friends);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Content-Type", "application/x-www-form-urlencoded");
-                return params;
-            }
-        };
-
-        queue.add(sr);
+    public void onLoadMore(int totalItemsCount, int visibleItemsCount, int firstVisibleItemPosition) {
+        if ((nextPageId != null) && !isLoadingMore && (visibleItemsCount + firstVisibleItemPosition >= totalItemsCount)) {
+            //loadMore
+            isLoadingMore = true;
+            friendsListUseCase.getFBFriendsList(userId, fbToken.getToken(), PAGE_SIZE, nextPageId, friendsListCallback);
+        }
     }
 
+    private final Callback<FriendsListResponse> friendsListCallback = new Callback<FriendsListResponse>() {
+        @Override
+        public void onResponse(Call<FriendsListResponse> call, retrofit2.Response<FriendsListResponse> response) {
+            isLoadingMore = false;
+            if (response.isSuccessful()) {
+                FriendsListResponse responseResult = response.body();
+                nextPageId = responseResult.getNextPageId();
+                previousPageId = responseResult.getPreviousPageId();
+                ArrayList<FriendItemData> newFriendsList = responseResult.getFriendsDataList();
+
+                //Get Correct insert Index
+                int index = 0;
+                if (friendsList.size() > 0) {
+                    index = friendsList.size() - 1;
+                }
+                friendsList.addAll(index, newFriendsList);
+
+                if ((nextPageId != null)) {
+                    //Add Null object for loading more item
+                    if (index == 0) {
+                        friendsList.add(null);
+                    }
+                } else {
+                    //Remove loading more item
+                    index = friendsList.size() - 1;
+                    if (friendsList.get(index) == null) {
+                        friendsList.remove(index);
+                    }
+                }
+
+                view.loadFriendsList(friendsList);
+            } else {
+                //TODO show error message
+            }
+        }
+
+        @Override
+        public void onFailure(Call<FriendsListResponse> call, Throwable t) {
+            isLoadingMore = false;
+            //TODO Show error message
+        }
+    };
 }

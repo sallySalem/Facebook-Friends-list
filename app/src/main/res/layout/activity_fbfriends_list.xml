@@ -13,13 +13,13 @@
         android:layout_height="match_parent"
         android:layout_marginTop="5dp" >
 
-        <ListView
-            android:id="@+id/lv_FriendsList"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_friends_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@android:color/transparent"
             android:listSelector="@android:color/transparent" >
-        </ListView>
+        </android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
