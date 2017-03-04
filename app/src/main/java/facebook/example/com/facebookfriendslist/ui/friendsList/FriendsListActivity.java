@@ -3,8 +3,9 @@ package facebook.example.com.facebookfriendslist.ui.friendsList;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 
@@ -13,10 +14,10 @@ import facebook.example.com.facebookfriendslist.adapter.FriendsAdapter;
 import facebook.example.com.facebookfriendslist.data.model.FriendItemData;
 
 
-public class FriendsListActivity extends ActionBarActivity implements FriendsListView{
+public class FriendsListActivity extends ActionBarActivity implements FriendsListView {
     private ArrayList<FriendItemData> friendsList = new ArrayList<FriendItemData>();
     private SwipeRefreshLayout swipeLayout;
-    private ListView lvFriendsList;
+    private RecyclerView lvFriendsList;
     private FriendsAdapter friendsAdapter;
     private FriendsListPresenter presenter;
 
@@ -31,11 +32,6 @@ public class FriendsListActivity extends ActionBarActivity implements FriendsLis
 
     @Override
     public void initializeView() {
-        lvFriendsList = (ListView) findViewById(R.id.lv_FriendsList);
-        friendsAdapter = new FriendsAdapter(getApplicationContext(), friendsList);
-        friendsAdapter.notifyDataSetChanged();
-        lvFriendsList.setAdapter(friendsAdapter);
-
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setColorSchemeColors(
                 getResources().getColor(android.R.color.holo_green_dark),
@@ -43,6 +39,26 @@ public class FriendsListActivity extends ActionBarActivity implements FriendsLis
                 getResources().getColor(android.R.color.holo_blue_dark),
                 getResources().getColor(android.R.color.holo_orange_dark));
         swipeLayout.setRefreshing(true);
+
+        lvFriendsList = (RecyclerView) findViewById(R.id.rv_friends_list);
+
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        lvFriendsList.setLayoutManager(linearLayoutManager);
+
+        friendsAdapter = new FriendsAdapter(friendsList);
+        lvFriendsList.setAdapter(friendsAdapter);
+
+        lvFriendsList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int totalItemsCount = linearLayoutManager.getItemCount();
+                int visibleItemsCount = lvFriendsList.getChildCount();
+                int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+
+                presenter.onLoadMore(totalItemsCount, visibleItemsCount, firstVisibleItemPosition);
+            }
+        });
     }
 
     @Override

@@ -1,5 +1,7 @@
 package facebook.example.com.facebookfriendslist.data.model;
 
+import android.support.v7.widget.RecyclerView;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
