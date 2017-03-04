@@ -19,12 +19,13 @@ import retrofit2.Callback;
  */
 
 public class GetFriendsList {
-    public void getTaggableFriends(AccessToken fbToken, GraphRequest.Callback graphRequestCallback) {
+
+   /* public void getTaggableFriends(AccessToken fbToken, GraphRequest.Callback graphRequestCallback) {
         //fbToken return from login with facebook
         GraphRequestAsyncTask r = GraphRequest.newGraphPathRequest(fbToken,
                 "/me/taggable_friends", graphRequestCallback
         ).executeAsync();
-    }
+    }*/
 
     public void getFBFriendsList(String userId, String accessToken, int limit, String afterPage, Callback<FriendsListResponse> friendsListCallback) {
         FacebookFriendList facebookListService = ApiService.getService().create(FacebookFriendList.class);

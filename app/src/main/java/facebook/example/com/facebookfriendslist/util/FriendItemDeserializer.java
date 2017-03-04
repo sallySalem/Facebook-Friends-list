@@ -31,6 +31,7 @@ public class FriendItemDeserializer implements JsonDeserializer<FriendsListRespo
     private final String DATA_KEY = "data";
     private final String PAGING_KEY = "paging";
     private final String CURSORS_KEY = "cursors";
+    private final String NEXT_KEY = "next";
 
     @Override
     public FriendsListResponse deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -48,12 +49,14 @@ public class FriendItemDeserializer implements JsonDeserializer<FriendsListRespo
                 item.setPicture(picUrl);
                 friendItemDataList.add(item);
             }
-            JsonObject pagingObject = friends.getAsJsonObject(PAGING_KEY).getAsJsonObject(CURSORS_KEY);
-            String nextPageId = pagingObject.get(BEFORE_KEY).getAsString();
-            String previousPageId = pagingObject.get(AFTER_KEY).getAsString();
-
-            response.setNextPageId(nextPageId);
-            response.setPreviousPageId(previousPageId);
+            JsonObject pagingObject = friends.getAsJsonObject(PAGING_KEY);
+            if (pagingObject.has(NEXT_KEY)) {
+                JsonObject cursorsObject = pagingObject.getAsJsonObject(CURSORS_KEY);
+                String nextPageId = cursorsObject.get(AFTER_KEY).getAsString();
+                String previousPageId = cursorsObject.get(BEFORE_KEY).getAsString();
+                response.setNextPageId(nextPageId);
+                response.setPreviousPageId(previousPageId);
+            }
             response.setFriendsDataList(friendItemDataList);
         }
         return response;
