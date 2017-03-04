@@ -15,8 +15,8 @@ import retrofit2.http.Query;
 
 public interface FacebookFriendList {
     @GET("v2.4/{user_id}/taggable_friends")
-    Call<FriendItemData> getMovieDetails(@Path("user_id") String userId,
-                                         @Query("access_token") String accessToken,
-                                         @Query("limit") int limit,
-                                         @Query("after") String afterPage);
+    Call<FriendsListResponse> getFriendsList(@Path("user_id") String userId,
+                                        @Query("access_token") String accessToken,
+                                        @Query("limit") int limit,
+                                        @Query("after") String afterPage);
 }

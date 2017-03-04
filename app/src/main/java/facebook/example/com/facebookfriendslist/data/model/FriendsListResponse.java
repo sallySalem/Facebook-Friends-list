@@ -11,24 +11,31 @@ import java.util.ArrayList;
  */
 
 public class FriendsListResponse {
-    @SerializedName("data")
-    private ArrayList<FriendItemData> data;
-    @SerializedName("paging")
-    private Object paging;
+    private ArrayList<FriendItemData> friendsDataList;
+    private String nextPageId;
+    private String previousPageId;
 
-    public Object getPaging() {
-        return paging;
+    public ArrayList<FriendItemData> getFriendsDataList() {
+        return friendsDataList;
     }
 
-    public void setPaging(Object paging) {
-        this.paging = paging;
+    public void setFriendsDataList(ArrayList<FriendItemData> friendsDataList) {
+        this.friendsDataList = friendsDataList;
     }
 
-    public ArrayList<FriendItemData> getData() {
-        return data;
+    public String getNextPageId() {
+        return nextPageId;
     }
 
-    public void setData(ArrayList<FriendItemData> data) {
-        this.data = data;
+    public void setNextPageId(String nextPageId) {
+        this.nextPageId = nextPageId;
+    }
+
+    public String getPreviousPageId() {
+        return previousPageId;
+    }
+
+    public void setPreviousPageId(String previousPageId) {
+        this.previousPageId = previousPageId;
     }
 }
